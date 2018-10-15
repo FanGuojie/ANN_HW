@@ -11,7 +11,7 @@ def onehot_encoding(label, max_num_class):
 
 
 def calculate_acc(output, label):
-    correct = np.sum(np.argmax(output, axis=1) == label)
+    correct = np.sum(np.argmax(output, axis=1).T == label)
     return correct / len(label)
 
 
@@ -19,8 +19,3 @@ def LOG_INFO(msg):
     now = datetime.now()
     display_now = str(now).split(' ')[1][:-3]
     print(display_now + ' ' + msg)
-
-def fz(a):
-    return a[::-1]
-def FZ(mat):
-    return np.array(fz(list(map(fz, mat))))

@@ -33,10 +33,8 @@ class Relu(Layer):
     def backward(self, grad_output):
         '''Using your codes in Homework 1'''
         tensor = self._saved_tensor
-        # print("relu input:",tensor)
         grad_rule = np.where(tensor > 0, 1.0, 0.0)
         return np.multiply(grad_rule, grad_output)
-
 
 
 class Sigmoid(Layer):
@@ -71,14 +69,14 @@ class Linear(Layer):
 
     def forward(self, input):
         '''Using your codes in Homework 1'''
-        self._saved_for_backward(np.mat(input))
-        return np.dot(np.mat(input), self.W) + self.b
+        self._saved_for_backward(input)
+        return np.dot(input, self.W) + self.b
 
     def backward(self, grad_output):
         '''Using your codes in Homework 1'''
         tensor = self._saved_tensor
         self.grad_b = np.mean(grad_output, axis=0)
-        self.grad_W = np.dot(tensor.T, grad_output) / len(grad_output)
+        self.grad_W = np.dot(tensor.T, grad_output)
         return np.dot(grad_output, self.W.T)
 
     def update(self, config):
@@ -103,12 +101,9 @@ class Reshape(Layer):
         return input.reshape(*self.new_shape)
 
     def backward(self, grad_output):
-        grad_output=np.array(grad_output)
-        # print("grad_output",grad_output.shape)
+        grad_output = np.array(grad_output)
         input = self._saved_tensor
-        # print("input:",input.shape)
-
-        return grad_output.reshape(input.shape)
+        return grad_output.reshape(*input.shape)
 
 
 class Conv2D(Layer):
@@ -116,20 +111,26 @@ class Conv2D(Layer):
         super(Conv2D, self).__init__(name, trainable=True)
         self.kernel_size = kernel_size
         self.pad = pad
-        self.W = np.random.randn(out_channel, in_channel, kernel_size, kernel_size)
+        self.W = np.random.randn(kernel_size, kernel_size, in_channel, out_channel)
         self.b = np.zeros(out_channel)
+
+        self.ci = in_channel
+        self.co = out_channel
 
         self.diff_W = np.zeros(self.W.shape)
         self.diff_b = np.zeros(out_channel)
 
     def forward(self, input):
-        self._saved_for_backward(input)
-        output = conv2d_forward(input, self.W, self.b, self.kernel_size, self.pad)
+        # self._saved_for_backward(input)
+        output,input_with_pad = conv2d_forward(input, self.W, self.b, self.kernel_size, self.pad)
+        self._saved_for_backward(input_with_pad)
         return output
 
     def backward(self, grad_output):
-        input = self._saved_tensor
-        grad_input, self.grad_W, self.grad_b = conv2d_backward(input, grad_output, self.W, self.b, self.kernel_size, self.pad)
+        input_with_pad = self._saved_tensor
+        grad_input, self.grad_W, self.grad_b = conv2d_backward(input_with_pad, grad_output, self.W, self.b,
+                                                               self.kernel_size,
+                                                               self.pad)
         return grad_input
 
     def update(self, config):

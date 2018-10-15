@@ -1,6 +1,8 @@
 from utils import LOG_INFO, onehot_encoding, calculate_acc
 import numpy as np
-
+from PIL import Image
+import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 
 def data_iterator(x, y, batch_size, shuffle=True):
     indx = list(range(len(x)))
@@ -24,7 +26,6 @@ def train_net(model, loss, config, inputs, labels, batch_size, disp_freq):
         # forward net
         output = model.forward(input)
         # calculate loss
-        # print("output:",output.shape)
         loss_value = loss.forward(output, target)
         # generate gradient w.r.t loss
         grad = loss.backward(output, target)
@@ -56,6 +57,25 @@ def test_net(model, loss, inputs, labels, batch_size):
         acc_value = calculate_acc(output, label)
         loss_list.append(loss_value)
         acc_list.append(acc_value)
-
-    msg = '    Testing, total mean loss %.5f, total acc %.5f' % (np.mean(loss_list), np.mean(acc_list))
+    lo=np.mean(loss_list)
+    ac=np.mean(acc_list)
+    msg = '    Testing, total mean loss %.5f, total acc %.5f' % (lo,ac)
     LOG_INFO(msg)
+    return  lo ,ac
+
+def show4category(model,inputs,labels,categories):
+    for input, label in data_iterator(inputs, labels, 10000, shuffle=False):
+        output = model.forward(input)
+        out=np.argmax(output, axis=1).T
+        for cat in categories:
+            for i in range(10000):
+                print(out[i],cat)
+                if(out[i]==cat ):
+                    print(input[i].shape)
+                    plt.imshow(input[i].reshape(28,28), cmap='gray')
+                    plt.savefig(str(cat)+".png")
+                    plt.show()
+                    break
+
+
+

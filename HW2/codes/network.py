@@ -1,5 +1,8 @@
-from sklearn.utils.extmath import softmax
-
+import  numpy as np
+# def softmax(x):
+#     x = x - np.max(x)
+#     exp_x = np.exp(x)
+#     return exp_x / np.sum(exp_x)
 
 class Network(object):
     def __init__(self):
@@ -13,19 +16,16 @@ class Network(object):
 
     def forward(self, input):
         output = input
-        # print("forwand")
         for i in range(self.num_layers):
-            # print(self.layer_list[i].name)
-            # print(output.shape)
             output = self.layer_list[i].forward(output)
-        output=softmax(output)
+        # (n,_)=output.shape
+        # for i in range(n):
+        #     output[i]=softmax(output[i])
         return output
 
     def backward(self, grad_output):
         grad_input = grad_output
-        # print("backward")
         for i in range(self.num_layers - 1, -1, -1):
-            # print("b ",self.layer_list[i].name)
             grad_input = self.layer_list[i].backward(grad_input)
 
     def update(self, config):
