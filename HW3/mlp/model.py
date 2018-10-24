@@ -9,10 +9,10 @@ class Model:
                  learning_rate_decay_factor=0.9995):
         self.x_ = tf.placeholder(tf.float32, [None, 28*28])
         self.y_ = tf.placeholder(tf.int32, [None])
-
+        self.h_units=300
 		# TODO:  fill the blank of the arguments
-        self.loss, self.pred, self.acc = self.forward()
-        self.loss_val, self.pred_val, self.acc_val = self.forward()
+        self.loss, self.pred, self.acc = self.forward(is_train=True)
+        self.loss_val, self.pred_val, self.acc_val = self.forward(is_train=False)
         
         self.learning_rate = tf.Variable(float(learning_rate), trainable=False, dtype=tf.float32)
         self.learning_rate_decay_op = self.learning_rate.assign(self.learning_rate * learning_rate_decay_factor)  # Learning rate decay
@@ -37,7 +37,13 @@ class Model:
             # Your Relu Layer
             # Your Dropout Layer: use dropout_layer function
             # Your Linear Layer
-            logits = tf.Variable(tf.constant(0.0, shape=[100, 10]))  # deleted this line after you implement above layers
+            W1 = tf.Variable(tf.truncated_normal([784, 300], stddev=0.1), name="W1")
+            b1 = tf.Variable(tf.zeros([300]), name="b1")
+            W2 = tf.Variable(tf.truncated_normal([300, 10], stddev=0.1), name="W2")
+            b2 = tf.Variable(tf.zeros([10]), name="b2")
+
+            hidden1 = tf.nn.relu(tf.matmul(self.x_, W1) + b1)
+            logits = tf.nn.softmax(tf.matmul(hidden1, W2) + b2)
 
         loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y_, logits=logits))
         pred = tf.argmax(logits, 1)  # Calculate the prediction result
