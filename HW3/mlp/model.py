@@ -47,7 +47,19 @@ class Model:
 
             u1=tf.matmul(x_,W1)+b1
             mu1,sigma1=batch_normalization_layer(u1)
+            scale1=tf.Variable(tf.ones[1])
+            shift1=tf.Variable(tf.zeros[1])
+            epsilon=0.001
+            u1=tf.nn.batch_normalization(u1,mu1,sigma1,shift1,scale1,epsilon)
+            o1=tf.nn.relu(u1)
 
+            u2 = tf.matmul(o1, W2) + b2
+            mu2, sigma2 = batch_normalization_layer(u2)
+            scale2 = tf.Variable(tf.ones[1])
+            shift2 = tf.Variable(tf.zeros[1])
+            epsilon = 0.001
+            u2 = tf.nn.batch_normalization(u2, mu2, sigma2, shift2, scale2, epsilon)
+            y = tf.nn.softmax(u2)
 
             keep_prob=tf.placeholder(tf.float32)
 
@@ -65,7 +77,16 @@ def batch_normalization_layer(incoming, is_train=True):
     # TODO: implement the batch normalization function and applied it on fully-connected layers
     # NOTE:  If isTrain is True, you should return calculate mu and sigma by mini-batch
     #       If isTrain is False, you must estimate mu and sigma from training data
-    pass
+    mu,sigma=tf.nn.moments(incoming,axes=[0])
+    ema = tf.train.ExponentialMovingAverage(decay=0.5)
+
+    def mean_var_with_update():
+        ema_apply_op = ema.apply([mu, sigma])
+        with tf.control_dependencies([ema_apply_op]):
+            return tf.identity(mu), tf.identity(sigma)
+
+    mu, var = mean_var_with_update()
+    return mu,sigma
     
 def dropout_layer(incoming, drop_rate, is_train=True):
     # TODO: implement the dropout function and applied it on fully-connected layers
