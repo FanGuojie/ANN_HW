@@ -39,22 +39,27 @@ class Model:
             # Your Relu Layer
             # Your Dropout Layer: use dropout_layer function
             # Your Linear Layer
-            W1=tf.Variable(tf.truncated_normal([784,self.h_units]),name="W1")
+            W1=tf.Variable(tf.truncated_normal([784,self.h_units],stddev=0.1),name="W1")
             b1=tf.Variable(tf.zeros([self.h_units]),name="b1")
-            W2=tf.Variable(tf.zeros([self.h_units,10]),name="W2")
+            W2 = tf.Variable(tf.truncated_normal([self.h_units,10], stddev=0.1), name="W2")
             b2=tf.Variable(tf.zeros([10]),name="b2")
 
+            hidden1 = tf.nn.relu(tf.matmul(self.x_, W1) + b1)
+            hidden1_drop = tf.nn.dropout(hidden1, self.keep_prob)
+            logits = tf.nn.softmax(tf.matmul(hidden1_drop, W2) + b2)
 
-            u1=tf.matmul(self.x_,W1)+b1
-            mu1,sigma1=batch_normalization_layer(u1,is_train=is_train)
-            scale1=tf.Variable(tf.ones([1]),name="scale1")
-            shift1=tf.Variable(tf.zeros([1]),name="shift1")
-            epsilon=0.001
-            u1=tf.nn.batch_normalization(u1,mu1,sigma1,shift1,scale1,epsilon)
-            h1=tf.nn.relu(u1)
-            h1_drop=dropout_layer(h1,self.keep_prob,is_train=is_train)
-            u2 = tf.matmul(h1_drop, W2) + b2
-            logits = tf.nn.softmax(u2)
+
+
+            # u1=tf.matmul(self.x_,W1)+b1
+            # mu1,sigma1=batch_normalization_layer(u1,is_train=is_train)
+            # scale1=tf.Variable(tf.ones([1]),name="scale1")
+            # shift1=tf.Variable(tf.zeros([1]),name="shift1")
+            # epsilon=0.001
+            # u1=tf.nn.batch_normalization(u1,mu1,sigma1,shift1,scale1,epsilon)
+            # h1=tf.nn.relu(u1)
+            # h1_drop=dropout_layer(h1,self.keep_prob,is_train=is_train)
+            # u2 = tf.matmul(h1_drop, W2) + b2
+            # logits = tf.nn.softmax(u2)
 
         loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y_, logits=logits))
         pred = tf.argmax(logits, 1)  # Calculate the prediction result

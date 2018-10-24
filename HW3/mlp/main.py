@@ -86,6 +86,7 @@ with tf.Session() as sess:
         else:
             tf.global_variables_initializer().run()
 
+
         pre_losses = [1e18] * 3
         best_val_acc = 0.0
         for item in tf.trainable_variables():
