@@ -41,7 +41,7 @@ def train_epoch(model, sess, X, y): # Training Process
     st, ed, times = 0, FLAGS.batch_size, 0
     while st < len(X) and ed <= len(X):
         X_batch, y_batch = X[st:ed], y[st:ed]
-        feed = {model.x_: X_batch, model.y_: y_batch}
+        feed = {model.x_: X_batch, model.y_: y_batch,model.keep_prob:FLAGS.keep_prob}
         loss_, acc_, _ = sess.run([model.loss, model.acc, model.train_op], feed)
         loss += loss_
         acc += acc_
@@ -57,7 +57,7 @@ def valid_epoch(model, sess, X, y): # Valid Process
     st, ed, times = 0, FLAGS.batch_size, 0
     while st < len(X) and ed <= len(X):
         X_batch, y_batch = X[st:ed], y[st:ed]
-        feed = {model.x_: X_batch, model.y_: y_batch}
+        feed = {model.x_: X_batch, model.y_: y_batch,model.keep_prob:FLAGS.keep_prob}
         loss_, acc_ = sess.run([model.loss_val, model.acc_val], feed)
         loss += loss_
         acc += acc_

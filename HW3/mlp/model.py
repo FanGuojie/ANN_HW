@@ -9,6 +9,7 @@ class Model:
                  learning_rate_decay_factor=0.9995):
         self.x_ = tf.placeholder(tf.float32, [None, 28*28])
         self.y_ = tf.placeholder(tf.int32, [None])
+        self.keep_prob = tf.placeholder(tf.float32, name="keep_prob")
         self.h_units=300
 		# TODO:  fill the blank of the arguments
         self.loss, self.pred, self.acc = self.forward(is_train=True)
@@ -44,7 +45,8 @@ class Model:
             b2 = tf.get_variable(initializer=tf.zeros([10]), name="b2")
             # scope.reuse_variables()
             hidden1 = tf.nn.relu(tf.matmul(self.x_, W1) + b1)
-            logits = tf.nn.softmax(tf.matmul(hidden1, W2) + b2)
+            h1_drop = dropout_layer(hidden1, self.keep_prob, is_train=is_train)
+            logits = tf.nn.softmax(tf.matmul(h1_drop, W2) + b2)
 
         loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y_, logits=logits))
         pred = tf.argmax(logits, 1)  # Calculate the prediction result
@@ -64,6 +66,9 @@ def dropout_layer(incoming, drop_rate, is_train=True):
     # Note: When drop_rate=0, it means drop no values
     #       If isTrain is True, you should randomly drop some values, and scale the others by 1 / (1 - drop_rate)
     #       If isTrain is False, remain all values not changed
-    pass
+    if is_train:
+        return tf.nn.dropout(incoming, drop_rate)
+    else:
+        return incoming
 
 
