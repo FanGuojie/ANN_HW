@@ -27,9 +27,9 @@ class Model:
         self.saver = tf.train.Saver(tf.global_variables(), write_version=tf.train.SaverDef.V2,
                                     max_to_keep=3, pad_step_number=True, keep_checkpoint_every_n_hours=1.0)
                                     
-    def forward(self, is_train, reuse=None):
+    def forward(self, is_train, reuse=tf.AUTO_REUSE):
     
-        with tf.variable_scope("model", reuse=reuse):
+        with tf.variable_scope("model", reuse=tf.AUTO_REUSE) as scope:
             # TODO:  implement input -- Linear -- BN -- ReLU -- Dropout -- Linear -- loss
             #        the 10-class prediction output is named as "logits"
             # Your Linear Layer
@@ -37,11 +37,12 @@ class Model:
             # Your Relu Layer
             # Your Dropout Layer: use dropout_layer function
             # Your Linear Layer
-            W1 = tf.Variable(tf.truncated_normal([784, 300], stddev=0.1), name="W1")
-            b1 = tf.Variable(tf.zeros([300]), name="b1")
-            W2 = tf.Variable(tf.truncated_normal([300, 10], stddev=0.1), name="W2")
-            b2 = tf.Variable(tf.zeros([10]), name="b2")
 
+            W1 = tf.get_variable(name="W1",initializer=tf.truncated_normal([784, 300], stddev=0.1))
+            b1 = tf.get_variable(initializer=tf.zeros([300]), name="b1")
+            W2 = tf.get_variable(initializer=tf.truncated_normal([300, 10], stddev=0.1), name="W2")
+            b2 = tf.get_variable(initializer=tf.zeros([10]), name="b2")
+            # scope.reuse_variables()
             hidden1 = tf.nn.relu(tf.matmul(self.x_, W1) + b1)
             logits = tf.nn.softmax(tf.matmul(hidden1, W2) + b2)
 

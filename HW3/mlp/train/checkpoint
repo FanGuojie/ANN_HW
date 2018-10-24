@@ -1,4 +1,2 @@
-model_checkpoint_path: "checkpoint-00016000"
-all_model_checkpoint_paths: "checkpoint-00015000"
-all_model_checkpoint_paths: "checkpoint-00015500"
-all_model_checkpoint_paths: "checkpoint-00016000"
+model_checkpoint_path: "checkpoint-00021000"
+all_model_checkpoint_paths: "checkpoint-00021000"
