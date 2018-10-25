@@ -51,14 +51,16 @@ class Model:
             W_conv1=w_variable([5,5,1,32],"W_conv1")
             b_conv1=b_variable([32],"b_conv1")
             h_conv1=conv2d(self.x_,W_conv1)+b_conv1
-            h_relu1=tf.nn.relu(h_conv1)
+            bn1=batch_norm_layer(h_conv1,is_training=is_train)
+            h_relu1=tf.nn.relu(bn1)
             h_drop1=dropout_layer(h_relu1,drop_rate=self.keep_prob)
             h_pool1=max_pool_2x2(h_drop1)
 
             W_conv2=w_variable([5,5,32,64],"W_conv2")
             b_conv2=b_variable([64],"b_conv2")
             h_conv2=conv2d(h_pool1,W_conv2)+b_conv2
-            h_relu2=tf.nn.relu(h_conv2)
+            bn2=batch_norm_layer(h_conv2,is_training=is_train)
+            h_relu2=tf.nn.relu(bn2)
             h_drop2=dropout_layer(h_relu2,drop_rate=self.keep_prob)
             h_pool2=max_pool_2x2(h_drop2)
             h_pool2_flat=tf.reshape(h_pool2,[-1,7*7*64])
@@ -87,6 +89,23 @@ class Model:
         acc = tf.reduce_mean(tf.cast(correct_pred, tf.float32))  # Calculate the accuracy in this mini-batch
         
         return loss, pred, acc
+
+def batch_norm_layer(value, is_training=False, name='batch_norm'):
+    '''
+    批量归一化  返回批量归一化的结果
+
+    args:
+        value:代表输入，第一个维度为batch_size
+        is_training:当它为True，代表是训练过程，这时会不断更新样本集的均值与方差。当测试时，要设置成False，这样就会使用训练样本集的均值和方差。
+              默认测试模式
+        name：名称。
+    '''
+    if is_training is True:
+        # 训练模式 使用指数加权函数不断更新均值和方差
+        return tf.contrib.layers.batch_norm(inputs=value, decay=0.9, updates_collections=None, is_training=True)
+    else:
+        # 测试模式 不更新均值和方差，直接使用
+        return tf.contrib.layers.batch_norm(inputs=value, decay=0.9, updates_collections=None, is_training=False)
 
 def batch_normalization_layer(incoming, is_train=True):
     # TODO: implement the batch normalization function and applied it on fully-connected layers
