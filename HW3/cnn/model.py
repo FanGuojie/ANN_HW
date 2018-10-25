@@ -24,7 +24,7 @@ class Model:
                  learning_rate_decay_factor=0.9995):
         self.x_ = tf.placeholder(tf.float32, [None, 28, 28, 1])
         self.y_ = tf.placeholder(tf.int32, [None])
-
+        self.keep_prob=tf.placeholder(tf.float32)
         # TODO:  fill the blank of the arguments
         self.loss, self.pred, self.acc = self.forward(is_train=True)
         self.loss_val, self.pred_val, self.acc_val = self.forward(is_train=False)
@@ -52,14 +52,17 @@ class Model:
             b_conv1=b_variable([32],"b_conv1")
             h_conv1=conv2d(self.x_,W_conv1)+b_conv1
             h_relu1=tf.nn.relu(h_conv1)
-            h_pool1=max_pool_2x2(h_relu1)
+            h_drop1=dropout_layer(h_relu1,drop_rate=self.keep_prob)
+            h_pool1=max_pool_2x2(h_drop1)
 
             W_conv2=w_variable([5,5,32,64],"W_conv2")
             b_conv2=b_variable([64],"b_conv2")
             h_conv2=conv2d(h_pool1,W_conv2)+b_conv2
             h_relu2=tf.nn.relu(h_conv2)
-            h_pool2=max_pool_2x2(h_relu2)
+            h_drop2=dropout_layer(h_relu2,drop_rate=self.keep_prob)
+            h_pool2=max_pool_2x2(h_drop2)
             h_pool2_flat=tf.reshape(h_pool2,[-1,7*7*64])
+
             W_fc=w_variable([7*7*64,10],name="W_fc")
             b_fc=b_variable([10],name="b_fc")
             logits=tf.nn.softmax(tf.matmul(h_pool2_flat,W_fc)+b_fc)
@@ -96,4 +99,7 @@ def dropout_layer(incoming, drop_rate, is_train=True):
     # Note: When drop_rate=0, it means drop no values
     #       If isTrain is True, you should randomly drop some values, and scale the others by 1 / (1 - drop_rate)
     #       If isTrain is False, remain all values not changed
-    pass
+    if is_train:
+        return tf.nn.dropout(incoming, drop_rate)
+    else:
+        return incoming

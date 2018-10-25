@@ -2,20 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2e4190d9-fc0a-45c3-9e21-09c2f473a755" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../cnn/.idea/cnn.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../cnn/.idea/cnn.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../cnn/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/../cnn/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/mlp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/mlp.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train/checkpoint" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train/checkpoint-00006000.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train/checkpoint-00006000.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train/checkpoint-00006000.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train/checkpoint-00016000.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train/checkpoint-00016000.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train/checkpoint-00016000.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MNIST_data/t10k-images-idx3-ubyte.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MNIST_data/t10k-labels-idx1-ubyte.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MNIST_data/train-images-idx3-ubyte.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MNIST_data/train-labels-idx1-ubyte.gz" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,24 +25,24 @@
     <session id="-558296556">
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="1061" />
-          <entry key="txt" value="13" />
+          <entry key="py" value="1166" />
+          <entry key="txt" value="35" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="13" />
-          <entry key="Python" value="1061" />
+          <entry key="PLAIN_TEXT" value="35" />
+          <entry key="Python" value="1166" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="8" />
+          <entry key="py" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="8" />
+          <entry key="Python" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.lifecycle.project">
@@ -64,9 +56,21 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/model.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="289">
+              <caret line="116" column="4" lean-forward="true" selection-start-line="116" selection-start-column="4" selection-end-line="119" selection-end-column="23" />
+              <folding>
+                <element signature="e#25#48#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../cnn/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
+            <state relative-caret-position="1445">
               <caret line="90" column="29" selection-start-line="90" selection-start-column="29" selection-end-line="90" selection-end-column="29" />
             </state>
           </provider>
@@ -75,11 +79,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../cnn/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="22" column="34" selection-start-line="22" selection-start-column="34" selection-end-line="22" selection-end-column="34" />
+            <state relative-caret-position="28">
+              <caret line="62" column="40" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="40" />
               <folding>
                 <element signature="e#25#48#0" expanded="true" />
-                <marker date="1540442875844" expanded="true" signature="507:581" ph="..." />
+                <marker date="1540443257576" expanded="true" signature="507:581" ph="..." />
               </folding>
             </state>
           </provider>
@@ -307,12 +311,12 @@
       <option name="project" value="LOCAL" />
       <updated>1540425004931</updated>
     </task>
-    <task id="LOCAL-00002" summary="can run , but no train">
-      <created>1540389484876</created>
+    <task id="LOCAL-00002" summary="mlp finish &amp; cnn basic">
+      <created>1540442920665</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1540389484876</updated>
+      <updated>1540442920665</updated>
     </task>
     <task id="LOCAL-00003" summary="debug mlp 1">
       <created>1540393419557</created>
@@ -321,19 +325,19 @@
       <option name="project" value="LOCAL" />
       <updated>1540393419557</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="1913" y="-7" width="1472" height="878" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25318247" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25318247" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33512065" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.33512065" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -359,7 +363,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add dropout" />
-    <option name="LAST_COMMIT_MESSAGE" value="add dropout" />
+    <MESSAGE value="mlp finish &amp; cnn basic" />
+    <option name="LAST_COMMIT_MESSAGE" value="mlp finish &amp; cnn basic" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/try.py" />
@@ -401,30 +406,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../cnn/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1445">
+          <caret line="90" column="29" selection-start-line="90" selection-start-column="29" selection-end-line="90" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="68" column="44" selection-start-line="68" selection-start-column="44" selection-end-line="68" selection-end-column="44" />
+        <state relative-caret-position="289">
+          <caret line="116" column="4" lean-forward="true" selection-start-line="116" selection-start-column="4" selection-end-line="119" selection-end-column="23" />
           <folding>
             <element signature="e#25#48#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../cnn/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="90" column="29" selection-start-line="90" selection-start-column="29" selection-end-line="90" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../cnn/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="22" column="34" selection-start-line="22" selection-start-column="34" selection-end-line="22" selection-end-column="34" />
+        <state relative-caret-position="28">
+          <caret line="62" column="40" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="40" />
           <folding>
             <element signature="e#25#48#0" expanded="true" />
-            <marker date="1540442875844" expanded="true" signature="507:581" ph="..." />
+            <marker date="1540443257576" expanded="true" signature="507:581" ph="..." />
           </folding>
         </state>
       </provider>
