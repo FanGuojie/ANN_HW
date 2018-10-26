@@ -8,8 +8,8 @@ from model import Model
 from load_data import load_mnist_4d
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
-tf.app.flags.DEFINE_integer("batch_size", 200, "batch size for training")
-tf.app.flags.DEFINE_integer("num_epochs", 200, "number of epochs")
+tf.app.flags.DEFINE_integer("batch_size", 2000, "batch size for training")
+tf.app.flags.DEFINE_integer("num_epochs", 100, "number of epochs")
 tf.app.flags.DEFINE_float("keep_prob", 0.75, "drop out rate")
 tf.app.flags.DEFINE_boolean("is_train", True, "False to inference")
 tf.app.flags.DEFINE_string("data_dir", "../MNIST_data", "data dir")
@@ -76,6 +76,9 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 
 with tf.Session(config=config) as sess:
+    merged = tf.summary.merge_all()
+    writer = tf.summary.FileWriter("logs/", sess.graph)
+
     if not os.path.exists(FLAGS.train_dir):
         os.mkdir(FLAGS.train_dir)
     if FLAGS.is_train:
@@ -92,10 +95,11 @@ with tf.Session(config=config) as sess:
         best_val_acc = 0.0
         for epoch in range(FLAGS.num_epochs):
             start_time = time.time()
-            train_acc, train_loss = train_epoch(cnn_model, sess, X_train, y_train,epoch)
+            train_acc, train_loss = train_epoch(cnn_model, sess, X_train, y_train,epoch,merged)
             X_train, y_train = shuffle(X_train, y_train, 1)
 
             val_acc, val_loss = valid_epoch(cnn_model, sess, X_val, y_val)
+
 
             if val_acc >= best_val_acc:
                 best_val_acc = val_acc

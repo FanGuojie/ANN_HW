@@ -26,7 +26,7 @@ class Model:
         self.y_ = tf.placeholder(tf.int32, [None])
         self.times = tf.placeholder(tf.int32)
         self.epoch = tf.placeholder(tf.int32)
-        self.iter = self.epoch * FLAGS.batch_size + self.times
+        self.iter = self.epoch * (50000/FLAGS.batch_size) + self.times
         # TODO:  fill the blank of the arguments
         self.loss, self.pred, self.acc = self.forward(is_train=True)
         self.loss_val, self.pred_val, self.acc_val = self.forward(is_train=False)
@@ -52,54 +52,27 @@ class Model:
         with tf.variable_scope("model", reuse=reuse):
             # TODO: implement input -- Conv -- BN -- ReLU -- Dropout -- MaxPool -- Conv -- BN -- ReLU -- Dropout -- MaxPool -- Linear -- loss
             #        the 10-class prediction output is named as "logits"
-            K = 24  # first convolutional layer output depth
-            L = 48  # second convolutional layer output depth
-            M = 64  # third convolutional layer
-            N = 200  # fully connected layer
-            tst=tf.constant(not is_train,dtype=tf.bool)
-            W1 = tf.get_variable(name="W1",
-                initializer=tf.truncated_normal([6, 6, 1, K], stddev=0.1))  # 6x6 patch, 1 input channel, K output channels
-            B1 = tf.get_variable(name="b1",initializer=tf.constant(0.1, tf.float32, [K]))
-            W2 = tf.get_variable(name="W2",initializer=tf.truncated_normal([5, 5, K, L], stddev=0.1))
-            B2 = tf.get_variable(name="b2",initializer=tf.constant(0.1, tf.float32, [L]))
-            W3 = tf.get_variable(name="W3",initializer=tf.truncated_normal([4, 4, L, M], stddev=0.1))
-            B3 = tf.get_variable(name="b3",initializer=tf.constant(0.1, tf.float32, [M]))
+            W_conv1 = w_variable([5, 5, 1, 32], "W_conv1")
+            b_conv1 = b_variable([32], "b_conv1")
+            h_conv1 = conv2d(self.x_, W_conv1) + b_conv1
+            bn1 = batch_norm_layer(h_conv1, is_training=is_train)
 
-            W4 = tf.get_variable(name="W4",initializer=tf.truncated_normal([7 * 7 * M, N], stddev=0.1))
-            B4 = tf.get_variable(name="b4",initializer=tf.constant(0.1, tf.float32, [N]))
-            W5 = tf.get_variable(name="W5",initializer=tf.truncated_normal([N, 10], stddev=0.1))
-            B5 = tf.get_variable(name="b5",initializer=tf.constant(0.1, tf.float32, [10]))
+            h_relu1 = tf.nn.relu(bn1)
+            h_drop1 = dropout_layer(h_relu1, keep_prob=FLAGS.keep_prob)
+            h_pool1 = max_pool_2x2(h_drop1)
 
-            # The model
-            # batch norm scaling is not useful with relus
-            # batch norm offsets are used instead of biases
-            stride = 1  # output is 28x28
-            Y1l = tf.nn.conv2d(self.x_, W1, strides=[1, stride, stride, 1], padding='SAME')
-            Y1bn, update_ema1 = batchnorm(Y1l, tst,  B1,self.iter, convolutional=True)
-            Y1r = tf.nn.relu(Y1bn)
-            Y1 = tf.nn.dropout(Y1r, FLAGS.keep_prob, compatible_convolutional_noise_shape(Y1r))
-            stride = 2  # output is 14x14
-            Y2l = tf.nn.conv2d(Y1, W2, strides=[1, stride, stride, 1], padding='SAME')
-            Y2bn, update_ema2 = batchnorm(Y2l, tst,  B2,self.iter, convolutional=True)
-            Y2r = tf.nn.relu(Y2bn)
-            Y2 = tf.nn.dropout(Y2r, FLAGS.keep_prob, compatible_convolutional_noise_shape(Y2r))
-            stride = 2  # output is 7x7
-            Y3l = tf.nn.conv2d(Y2, W3, strides=[1, stride, stride, 1], padding='SAME')
-            Y3bn, update_ema3 = batchnorm(Y3l, tst,  B3, self.iter,convolutional=True)
-            Y3r = tf.nn.relu(Y3bn)
-            Y3 = tf.nn.dropout(Y3r, FLAGS.keep_prob, compatible_convolutional_noise_shape(Y3r))
-
-            # reshape the output from the third convolution for the fully connected layer
-            YY = tf.reshape(Y3, shape=[-1, 7 * 7 * M])
-
-            Y4l = tf.matmul(YY, W4)
-            Y4bn, update_ema4 = batchnorm(Y4l, tst,  B4,self.iter)
-            Y4r = tf.nn.relu(Y4bn)
-            Y4 = tf.nn.dropout(Y4r,FLAGS.keep_prob)
-            Ylogits = tf.matmul(Y4, W5) + B5
-            logits = tf.nn.softmax(Ylogits)
-
-            update_ema = tf.group(update_ema1, update_ema2, update_ema3, update_ema4)
+            W_conv2=w_variable([5,5,32,64],"W_conv2")
+            b_conv2=b_variable([64],"b_conv2")
+            h_conv2=conv2d(h_pool1,W_conv2)+b_conv2
+            bn2=batch_norm_layer(h_conv2,is_training=is_train)
+            h_relu2=tf.nn.relu(bn2)
+            h_drop2=dropout_layer(h_relu2,keep_prob=FLAGS.keep_prob)
+            h_pool2=max_pool_2x2(h_drop2)
+            h_pool2_flat=tf.reshape(h_pool2,[-1,7*7*64])
+            # h1_flat = tf.reshape(h_pool1, [-1, 14 * 14 * 32])
+            W_fc = w_variable([7*7*64, 10], name="W_fc")
+            b_fc = b_variable([10], name="b_fc")
+            logits = tf.nn.softmax(tf.matmul(h_pool2_flat, W_fc) + b_fc)
 
 
 
@@ -111,7 +84,6 @@ class Model:
         acc = tf.reduce_mean(tf.cast(correct_pred, tf.float32))  # Calculate the accuracy in this mini-batch
         
         return loss, pred, acc
-
 def batch_norm_layer(value, is_training=False, name='batch_norm'):
     '''
     批量归一化  返回批量归一化的结果
@@ -129,6 +101,7 @@ def batch_norm_layer(value, is_training=False, name='batch_norm'):
         # 测试模式 不更新均值和方差，直接使用
         return tf.contrib.layers.batch_norm(inputs=value, decay=0.9, updates_collections=None, is_training=False)
 
+
 def batchnorm(Ylogits, is_test,  offset,iter, convolutional=False):
     exp_moving_avg = tf.train.ExponentialMovingAverage(0.9999,iter) # adding the iteration prevents from averaging across non-existing iterations
     bnepsilon = 1e-5
@@ -142,19 +115,21 @@ def batchnorm(Ylogits, is_test,  offset,iter, convolutional=False):
     Ybn = tf.nn.batch_normalization(Ylogits, m, v, offset, None, bnepsilon)
     return Ybn, update_moving_averages
 
-def no_batchnorm(Ylogits, is_test, iteration, offset, convolutional=False):
-    return Ylogits, tf.no_op()
-
 def compatible_convolutional_noise_shape(Y):
     noiseshape = tf.shape(Y)
     noiseshape = noiseshape * tf.constant([1,0,0,1]) + tf.constant([0,1,1,0])
     return noiseshape
 
-def batch_normalization_layer(incoming, is_train=True):
+def batch_normalization_layer(incoming, iter,is_train=True):
     # TODO: implement the batch normalization function and applied it on fully-connected layers
     # NOTE:  If isTrain is True, you should return calculate mu and sigma by mini-batch
     #       If isTrain is False, you must estimate mu and sigma from training data
-    pass
+    exp_moving_avg = tf.train.ExponentialMovingAverage(0.9999, iter)
+    mean,variance= tf.nn.moments(Ylogits, [0, 1, 2])
+    update_moving_averages = exp_moving_avg.apply([mean, variance])
+    mu = tf.cond(is_train, lambda: mean, lambda: exp_moving_avg.average(mean))
+    sigma = tf.cond(is_train, lambda: variance, lambda: exp_moving_avg.average(variance))
+    return mu,sigma
     
 def dropout_layer(incoming, keep_prob, is_train=True):
     # TODO: implement the dropout function and applied it on fully-connected layers
