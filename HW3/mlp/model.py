@@ -24,7 +24,9 @@ class Model:
         self.params = tf.trainable_variables()
 
         # TODO:  maybe you need to update the parameter of batch_normalization?
-        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss, global_step=self.global_step,
+        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        with tf.control_dependencies(update_ops):
+            self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss, global_step=self.global_step,
                                                                             var_list=self.params)  # Use Adam Optimizer
 
         self.saver = tf.train.Saver(tf.global_variables(), write_version=tf.train.SaverDef.V2,

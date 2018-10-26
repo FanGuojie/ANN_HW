@@ -55,19 +55,19 @@ class Model:
             h_relu1=tf.nn.relu(bn1)
             h_drop1=dropout_layer(h_relu1,drop_rate=self.keep_prob)
             h_pool1=max_pool_2x2(h_drop1)
-
-            W_conv2=w_variable([5,5,32,64],"W_conv2")
-            b_conv2=b_variable([64],"b_conv2")
-            h_conv2=conv2d(h_pool1,W_conv2)+b_conv2
-            bn2=batch_norm_layer(h_conv2,is_training=is_train)
-            h_relu2=tf.nn.relu(bn2)
-            h_drop2=dropout_layer(h_relu2,drop_rate=self.keep_prob)
-            h_pool2=max_pool_2x2(h_drop2)
-            h_pool2_flat=tf.reshape(h_pool2,[-1,7*7*64])
-
-            W_fc=w_variable([7*7*64,10],name="W_fc")
+            #
+            # W_conv2=w_variable([5,5,32,64],"W_conv2")
+            # b_conv2=b_variable([64],"b_conv2")
+            # h_conv2=conv2d(h_pool1,W_conv2)+b_conv2
+            # bn2=batch_norm_layer(h_conv2,is_training=is_train)
+            # h_relu2=tf.nn.relu(h_conv2)
+            # h_drop2=dropout_layer(h_relu2,drop_rate=self.keep_prob)
+            # h_pool2=max_pool_2x2(h_relu2)
+            # h_pool2_flat=tf.reshape(h_pool2,[-1,7*7*64])
+            h1_flat=tf.reshape(h_pool1,[-1,14*14*32])
+            W_fc=w_variable([14*14*32,10],name="W_fc")
             b_fc=b_variable([10],name="b_fc")
-            logits=tf.nn.softmax(tf.matmul(h_pool2_flat,W_fc)+b_fc)
+            logits=tf.nn.softmax(tf.matmul(h1_flat,W_fc)+b_fc)
 
             # Your BN Layer: use batch_normalization_layer function
             # Your Relu Layer
