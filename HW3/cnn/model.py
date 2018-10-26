@@ -36,7 +36,9 @@ class Model:
         self.params = tf.trainable_variables()
         
         # TODO:  maybe you need to update the parameter of batch_normalization?
-        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss, global_step=self.global_step,
+        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        with tf.control_dependencies(update_ops):
+            self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss, global_step=self.global_step,
                                                                             var_list=self.params)
 
         self.saver = tf.train.Saver(tf.global_variables(), write_version=tf.train.SaverDef.V2,
@@ -53,21 +55,20 @@ class Model:
             h_conv1=conv2d(self.x_,W_conv1)+b_conv1
             bn1=batch_norm_layer(h_conv1,is_training=is_train)
             h_relu1=tf.nn.relu(bn1)
-            h_drop1=dropout_layer(h_relu1,drop_rate=self.keep_prob)
+            h_drop1=dropout_layer(h_relu1,is_train=is_train,keep_prob=0.5)
             h_pool1=max_pool_2x2(h_drop1)
-            #
-            # W_conv2=w_variable([5,5,32,64],"W_conv2")
-            # b_conv2=b_variable([64],"b_conv2")
-            # h_conv2=conv2d(h_pool1,W_conv2)+b_conv2
-            # bn2=batch_norm_layer(h_conv2,is_training=is_train)
-            # h_relu2=tf.nn.relu(h_conv2)
-            # h_drop2=dropout_layer(h_relu2,drop_rate=self.keep_prob)
-            # h_pool2=max_pool_2x2(h_relu2)
-            # h_pool2_flat=tf.reshape(h_pool2,[-1,7*7*64])
-            h1_flat=tf.reshape(h_pool1,[-1,14*14*32])
-            W_fc=w_variable([14*14*32,10],name="W_fc")
+
+            W_conv2=w_variable([5,5,32,64],"W_conv2")
+            b_conv2=b_variable([64],"b_conv2")
+            h_conv2=conv2d(h_pool1,W_conv2)+b_conv2
+            bn2=batch_norm_layer(h_conv2,is_training=is_train)
+            h_relu2=tf.nn.relu(bn2)
+            h_drop2=dropout_layer(h_relu2,is_train=is_train,keep_prob=self.keep_prob)
+            h_pool2=max_pool_2x2(h_drop2)
+            h_pool2_flat=tf.reshape(h_pool2,[-1,7*7*64])
+            W_fc=w_variable([7*7*64,10],name="W_fc")
             b_fc=b_variable([10],name="b_fc")
-            logits=tf.nn.softmax(tf.matmul(h1_flat,W_fc)+b_fc)
+            logits=tf.nn.softmax(tf.matmul(h_pool2_flat,W_fc)+b_fc)
 
             # Your BN Layer: use batch_normalization_layer function
             # Your Relu Layer
@@ -113,12 +114,12 @@ def batch_normalization_layer(incoming, is_train=True):
     #       If isTrain is False, you must estimate mu and sigma from training data
     pass
     
-def dropout_layer(incoming, drop_rate, is_train=True):
+def dropout_layer(incoming, keep_prob, is_train=True):
     # TODO: implement the dropout function and applied it on fully-connected layers
     # Note: When drop_rate=0, it means drop no values
     #       If isTrain is True, you should randomly drop some values, and scale the others by 1 / (1 - drop_rate)
     #       If isTrain is False, remain all values not changed
     if is_train:
-        return tf.nn.dropout(incoming, drop_rate)
+        return tf.nn.dropout(x=incoming, keep_prob=keep_prob)
     else:
         return incoming

@@ -7,8 +7,9 @@ import time
 from model import Model
 from load_data import load_mnist_4d
 
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
 tf.app.flags.DEFINE_integer("batch_size", 100, "batch size for training")
-tf.app.flags.DEFINE_integer("num_epochs", 20, "number of epochs")
+tf.app.flags.DEFINE_integer("num_epochs", 160, "number of epochs")
 tf.app.flags.DEFINE_float("keep_prob", 0.5, "drop out rate")
 tf.app.flags.DEFINE_boolean("is_train", True, "False to inference")
 tf.app.flags.DEFINE_string("data_dir", "../MNIST_data", "data dir")
@@ -71,8 +72,10 @@ def valid_epoch(model, sess, X, y): # Valid Process
 def inference(model, sess, X): # Test Process
     return sess.run([model.pred_val], {model.x_: X})[0]
 
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
 
-with tf.Session() as sess:
+with tf.Session(config=config) as sess:
     if not os.path.exists(FLAGS.train_dir):
         os.mkdir(FLAGS.train_dir)
     if FLAGS.is_train:
