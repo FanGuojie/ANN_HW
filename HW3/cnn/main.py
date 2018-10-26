@@ -8,9 +8,9 @@ from model import Model
 from load_data import load_mnist_4d
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
-tf.app.flags.DEFINE_integer("batch_size", 100, "batch size for training")
-tf.app.flags.DEFINE_integer("num_epochs", 160, "number of epochs")
-tf.app.flags.DEFINE_float("keep_prob", 0.5, "drop out rate")
+tf.app.flags.DEFINE_integer("batch_size", 200, "batch size for training")
+tf.app.flags.DEFINE_integer("num_epochs", 200, "number of epochs")
+tf.app.flags.DEFINE_float("keep_prob", 0.75, "drop out rate")
 tf.app.flags.DEFINE_boolean("is_train", True, "False to inference")
 tf.app.flags.DEFINE_string("data_dir", "../MNIST_data", "data dir")
 tf.app.flags.DEFINE_string("train_dir", "./train", "training dir")
@@ -42,7 +42,7 @@ def train_epoch(model, sess, X, y): # Training Process
     st, ed, times = 0, FLAGS.batch_size, 0
     while st < len(X) and ed <= len(X):
         X_batch, y_batch = X[st:ed], y[st:ed]
-        feed = {model.x_: X_batch, model.y_: y_batch,model.keep_prob:FLAGS.keep_prob}
+        feed = {model.x_: X_batch, model.y_: y_batch}
         loss_, acc_, _ = sess.run([model.loss, model.acc, model.train_op], feed)
         loss += loss_
         acc += acc_
@@ -58,7 +58,7 @@ def valid_epoch(model, sess, X, y): # Valid Process
     st, ed, times = 0, FLAGS.batch_size, 0
     while st < len(X) and ed <= len(X):
         X_batch, y_batch = X[st:ed], y[st:ed]
-        feed = {model.x_: X_batch, model.y_: y_batch,model.keep_prob:FLAGS.keep_prob}
+        feed = {model.x_: X_batch, model.y_: y_batch}
         loss_, acc_ = sess.run([model.loss_val, model.acc_val], feed)
         loss += loss_
         acc += acc_
