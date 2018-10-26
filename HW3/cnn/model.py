@@ -24,6 +24,9 @@ class Model:
                  learning_rate_decay_factor=0.9995):
         self.x_ = tf.placeholder(tf.float32, [None, 28, 28, 1])
         self.y_ = tf.placeholder(tf.int32, [None])
+        self.times = tf.placeholder(tf.int32)
+        self.epoch = tf.placeholder(tf.int32)
+        self.iter = self.epoch * FLAGS.batch_size + self.times
         # TODO:  fill the blank of the arguments
         self.loss, self.pred, self.acc = self.forward(is_train=True)
         self.loss_val, self.pred_val, self.acc_val = self.forward(is_train=False)
@@ -34,9 +37,7 @@ class Model:
         self.global_step = tf.Variable(0, trainable=False)
         self.params = tf.trainable_variables()
 
-        self.time=tf.placeholder(tf.int32)
-        self.epoch=tf.placeholder(tf.int32)
-        iter=self.epoch*FLAGS.batch_size+self.time
+
         # TODO:  maybe you need to update the parameter of batch_normalization?
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
@@ -47,7 +48,7 @@ class Model:
                                     max_to_keep=3, pad_step_number=True, keep_checkpoint_every_n_hours=1.0)
 
     def forward(self, is_train, reuse=tf.AUTO_REUSE):
-    
+
         with tf.variable_scope("model", reuse=reuse):
             # TODO: implement input -- Conv -- BN -- ReLU -- Dropout -- MaxPool -- Conv -- BN -- ReLU -- Dropout -- MaxPool -- Linear -- loss
             #        the 10-class prediction output is named as "logits"
@@ -74,17 +75,17 @@ class Model:
             # batch norm offsets are used instead of biases
             stride = 1  # output is 28x28
             Y1l = tf.nn.conv2d(self.x_, W1, strides=[1, stride, stride, 1], padding='SAME')
-            Y1bn, update_ema1 = batchnorm(Y1l, tst,  B1, convolutional=True)
+            Y1bn, update_ema1 = batchnorm(Y1l, tst,  B1,self.iter, convolutional=True)
             Y1r = tf.nn.relu(Y1bn)
             Y1 = tf.nn.dropout(Y1r, FLAGS.keep_prob, compatible_convolutional_noise_shape(Y1r))
             stride = 2  # output is 14x14
             Y2l = tf.nn.conv2d(Y1, W2, strides=[1, stride, stride, 1], padding='SAME')
-            Y2bn, update_ema2 = batchnorm(Y2l, tst,  B2, convolutional=True)
+            Y2bn, update_ema2 = batchnorm(Y2l, tst,  B2,self.iter, convolutional=True)
             Y2r = tf.nn.relu(Y2bn)
             Y2 = tf.nn.dropout(Y2r, FLAGS.keep_prob, compatible_convolutional_noise_shape(Y2r))
             stride = 2  # output is 7x7
             Y3l = tf.nn.conv2d(Y2, W3, strides=[1, stride, stride, 1], padding='SAME')
-            Y3bn, update_ema3 = batchnorm(Y3l, tst,  B3, convolutional=True)
+            Y3bn, update_ema3 = batchnorm(Y3l, tst,  B3, self.iter,convolutional=True)
             Y3r = tf.nn.relu(Y3bn)
             Y3 = tf.nn.dropout(Y3r, FLAGS.keep_prob, compatible_convolutional_noise_shape(Y3r))
 
@@ -92,7 +93,7 @@ class Model:
             YY = tf.reshape(Y3, shape=[-1, 7 * 7 * M])
 
             Y4l = tf.matmul(YY, W4)
-            Y4bn, update_ema4 = batchnorm(Y4l, tst,  B4)
+            Y4bn, update_ema4 = batchnorm(Y4l, tst,  B4,self.iter)
             Y4r = tf.nn.relu(Y4bn)
             Y4 = tf.nn.dropout(Y4r,FLAGS.keep_prob)
             Ylogits = tf.matmul(Y4, W5) + B5
@@ -128,8 +129,8 @@ def batch_norm_layer(value, is_training=False, name='batch_norm'):
         # 测试模式 不更新均值和方差，直接使用
         return tf.contrib.layers.batch_norm(inputs=value, decay=0.9, updates_collections=None, is_training=False)
 
-def batchnorm(Ylogits, is_test,  offset, convolutional=False):
-    exp_moving_avg = tf.train.ExponentialMovingAverage(0.999) # adding the iteration prevents from averaging across non-existing iterations
+def batchnorm(Ylogits, is_test,  offset,iter, convolutional=False):
+    exp_moving_avg = tf.train.ExponentialMovingAverage(0.9999,iter) # adding the iteration prevents from averaging across non-existing iterations
     bnepsilon = 1e-5
     if convolutional:
         mean, variance = tf.nn.moments(Ylogits, [0, 1, 2])

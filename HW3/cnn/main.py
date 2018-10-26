@@ -37,12 +37,12 @@ def shuffle(X, y, shuffle_parts):
     return X, y
 
 
-def train_epoch(model, sess, X, y): # Training Process
+def train_epoch(model, sess, X, y,epoch): # Training Process
     loss, acc = 0.0, 0.0
     st, ed, times = 0, FLAGS.batch_size, 0
     while st < len(X) and ed <= len(X):
         X_batch, y_batch = X[st:ed], y[st:ed]
-        feed = {model.x_: X_batch, model.y_: y_batch}
+        feed = {model.x_: X_batch, model.y_: y_batch,model.epoch:epoch,model.times:times}
         loss_, acc_, _ = sess.run([model.loss, model.acc, model.train_op], feed)
         loss += loss_
         acc += acc_
@@ -92,7 +92,7 @@ with tf.Session(config=config) as sess:
         best_val_acc = 0.0
         for epoch in range(FLAGS.num_epochs):
             start_time = time.time()
-            train_acc, train_loss = train_epoch(cnn_model, sess, X_train, y_train)
+            train_acc, train_loss = train_epoch(cnn_model, sess, X_train, y_train,epoch)
             X_train, y_train = shuffle(X_train, y_train, 1)
 
             val_acc, val_loss = valid_epoch(cnn_model, sess, X_val, y_val)
